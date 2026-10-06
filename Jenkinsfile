@@ -60,8 +60,8 @@ pipeline {
                 echo 'Restarting Express systemd service...'
 
                 sh '''
-                    sudo systemctl restart "$SERVICE_NAME"
-                    sudo systemctl is-active --quiet "$SERVICE_NAME"
+                    sudo -n systemctl restart "$SERVICE_NAME"
+                    sudo -n systemctl is-active --quiet "$SERVICE_NAME"
                 '''
             }
         }
