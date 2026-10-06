@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DevOps To-Do | Express CI/CD</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #334155;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+        }
+
+        .badge {
+            display: inline-block;
+            background: #16a34a;
+            color: white;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #475569;
+            border-radius: 10px;
+            background: #1e293b;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #38bdf8;
+        }
+
+        textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            line-height: 1.5;
+        }
+
+        .success {
+            display: block;
+            background: #14532d;
+            border: 1px solid #22c55e;
+        }
+
+        .error {
+            display: block;
+            background: #7f1d1d;
+            border: 1px solid #ef4444;
+        }
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 22px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="card">
+
+            <span class="badge">● Express CI/CD Application</span>
+
+            <h1>DevOps To-Do Manager</h1>
+
+            <p class="subtitle">
+                Submit a task through the Express frontend.
+                The request is forwarded to the Flask backend
+                through the CI/CD deployment architecture.
+            </p>
+
+            <form id="todoForm">
+
+                <div class="form-group">
+                    <label for="itemName">Item Name</label>
+
+                    <input
+                        type="text"
+                        id="itemName"
+                        name="itemName"
+                        placeholder="Enter task name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="itemDescription">Item Description</label>
+
+                    <textarea
+                        id="itemDescription"
+                        name="itemDescription"
+                        placeholder="Describe your task..."
+                        required
+                    ></textarea>
+                </div>
+
+                <button type="submit" id="submitButton">
+                    Submit To-Do Item
+                </button>
+
+            </form>
+
+            <div id="message" class="message"></div>
+
+            <div class="footer">
+                Jenkins CI/CD • GitHub • AWS EC2 • Express + Flask
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const form = document.getElementById("todoForm");
+        const message = document.getElementById("message");
+        const submitButton = document.getElementById("submitButton");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const itemName = document.getElementById("itemName").value.trim();
+            const itemDescription =
+                document.getElementById("itemDescription").value.trim();
+
+            message.className = "message";
+            message.textContent = "";
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Submitting...";
+
+            try {
+                const response = await fetch("/submit", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        itemName,
+                        itemDescription
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Request failed.");
+                }
+
+                message.className = "message success";
+
+                message.innerHTML = `
+                    <strong>Success!</strong><br>
+                    ${data.message}<br>
+                    <strong>Item ID:</strong> ${data.itemId}
+                `;
+
+                form.reset();
+
+            } catch (error) {
+                message.className = "message error";
+
+                message.innerHTML = `
+                    <strong>Error:</strong><br>
+                    ${error.message}
+                `;
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = "Submit To-Do Item";
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "express-cicd",
+  "version": "1.0.0",
+  "description": "Express frontend application with Jenkins CI/CD automation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/test_server.js"
+  },
+  "keywords": [
+    "express",
+    "jenkins",
+    "cicd",
+    "devops",
+    "aws"
+  ],
+  "author": "Manvendra Singh",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
